@@ -123,7 +123,7 @@ class BlakeSuperfast(SuperfastAPI):
                       str(primary_doc.docid) + ')')
                 time.sleep(0.1)
                 for match in primary_doc.matches():
-                    time.sleep(0.1)
+                    # time.sleep(0.1)
                     if matrix_csv_path and match.excluded():
                             continue
                     print('    matching: ' + match.matching_doc.title)

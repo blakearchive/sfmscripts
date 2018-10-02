@@ -70,7 +70,7 @@ class XMLObject:
 
     def write_text(self, path=None):
         """Write transformed transcription text to file."""
-        filename = self.desc_id + '.txt'
+        filename = self.desc_id.lower() + '.txt'
         fullpath = os.path.join(path, filename)
         with open(fullpath, 'w', encoding='utf-8') as ofile:
             ofile.write(self.text())
