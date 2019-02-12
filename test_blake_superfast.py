@@ -110,7 +110,7 @@ def test_page():
 
 
 def test_short_title():
-    short_doc = blake.BlakeDoc.from_json('data/but518.wc.01.txt')
+    short_doc = blake.BlakeDoc.from_json('data/but518.wc.01.json')
     assert not (short_doc.work or short_doc.copy or short_doc.form or
                 short_doc.page)
 
