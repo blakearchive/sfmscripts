@@ -1,4 +1,16 @@
 #!/usr/bin/env python
+
+"""
+Exports text fragments from matching documents from a Superfastmatch API.
+
+Standard usage: blake_superfast.py
+
+Scoped usage: blake_superfast.py [desc_id]
+    e.g.: blake_superfast.py jerusalem.e.illbk.85
+Looks for matches only between the desc_id document and (all) other documents.
+"""
+
+import sys
 import csv
 import time
 import simplejson as json
@@ -364,9 +376,21 @@ if __name__ == '__main__':
     outfile = 'blake_superfast_matches.csv'
     matrix_relations_file = 'blake-relations.csv'
     print('Exporting matches/fragments to: ' + outfile)
+
+    # If a command line argument is given, take it to be a desc_id, and
+    # look find matches only between that document/desc_id and other documents.
+    if len(sys.argv) > 2:
+        raise ValueError("Too many arguments passed from the command line.")
+    elif len(sys.argv) == 2:
+        desc_id = sys.argv[1]
+        print('Finding matches only for documents with desc_id: ' + desc_id)
+        iterator = [doc for doc in API.documents() if doc.desc_id == desc_id]
+    else:
+        iterator = API.documents()
+
     try:
         API.export_fragments(
-            outfile, matrix_csv_path=matrix_relations_file
+            outfile, iterator=iterator, matrix_csv_path=matrix_relations_file
         )
     except FileNotFoundError:
         print('Exclude/matrix_relations file not found. Not excluding matches '
