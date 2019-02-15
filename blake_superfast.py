@@ -1,4 +1,23 @@
 #!/usr/bin/env python
+
+"""
+Exports text fragments from matching documents from a Superfastmatch API.
+
+Standard usage: blake_superfast.py
+
+Scoped usage: blake_superfast.py [desc_id_fragment]
+Only considers matches if one of the documents begins with desc_id_fragment
+    e.g.: blake_superfast.py jerusalem.e.illbk.85
+        Finds matches between jerusalem.e.illbk.85 and any other document
+    e.g.: blake_superfast.py jerusalem.e
+        Find matches between any jerusalem.e document and any other document
+Documents must begin with the given desc_id_fragment, not merely contain it.
+So, `blake_superfast.py e.illbk` would not consider "jerusalem.e.illbk.*" a
+matching document.
+
+"""
+
+import sys
 import csv
 import time
 import simplejson as json
@@ -364,9 +383,28 @@ if __name__ == '__main__':
     outfile = 'blake_superfast_matches.csv'
     matrix_relations_file = 'blake-relations.csv'
     print('Exporting matches/fragments to: ' + outfile)
+
+    # If a command line argument is given, take it to be a desc_id fragment,
+    # and find matches only between 1) documents that begin with that desc_id
+    # fragment and 2) other documents
+    if len(sys.argv) > 2:
+        raise ValueError("Too many arguments passed from the command line.")
+    elif len(sys.argv) == 2:
+        desc_id = sys.argv[1]
+        print('Finding matches only for documents with '
+              'desc_id beginning: ' + desc_id)
+        iterator = [doc for doc in API.documents()
+                    if doc.desc_id.startswith(desc_id)]
+        if not iterator:
+            print('No documents have desc_id beginning: ' + desc_id)
+            print('Exiting.')
+            sys.exit()
+    else:
+        iterator = API.documents()
+
     try:
         API.export_fragments(
-            outfile, matrix_csv_path=matrix_relations_file
+            outfile, iterator=iterator, matrix_csv_path=matrix_relations_file
         )
     except FileNotFoundError:
         print('Exclude/matrix_relations file not found. Not excluding matches '
